@@ -1,6 +1,6 @@
 #include<stdio.h>
 
-char*readmapline(char*filename){
+char*readMapLine(char*filename){
     char c;
     char*line;
     line=(char*)malloc(12*sizeof(char));
@@ -13,4 +13,19 @@ char*readmapline(char*filename){
     fclose(stream);
     *(line+i)='\0';
     return line;
+}
+
+int*getMapDimensions(char*str){
+    int*res;
+    int x=0,y=0,i;
+    char c;
+    for(i=0;(c=*(str+i))!='x';i++){
+        x=x*10+(c-'0');
+    }
+    for(i++;(c=*(str+i))!='\0';i++){
+        y=y*10+(c-'0');
+    }
+    *res=x;
+    *(res+1)=y;
+    return res;
 }

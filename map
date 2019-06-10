@@ -1,0 +1,16 @@
+#include<stdio.h>
+
+char*readmapline(char*filename){
+    char c;
+    char*line;
+    line=(char*)malloc(12*sizeof(char));
+    line=(char*)malloc(12*sizeof(char));
+    int i;
+    FILE*stream;
+    stream=fopen(filename,"r");
+    for(i=0;(c=getc(stream))!='\n';i++)
+        *(line+i)=c;
+    fclose(stream);
+    *(line+i)='\0';
+    return line;
+}

@@ -1,9 +1,8 @@
 #include<stdio.h>
 
-char*readMapLine(char*filename){
+char*readMapLine(char*filename){ //reads a line from a given file and returns it
     char c;
     char*line;
-    line=(char*)malloc(12*sizeof(char));
     line=(char*)malloc(12*sizeof(char));
     int i;
     FILE*stream;
@@ -15,7 +14,7 @@ char*readMapLine(char*filename){
     return line;
 }
 
-int*getMapDimensions(char*str){
+int*getMapDimensions(char*str){ //stores the read dimensions in an int*
     int*res;
     int x=0,y=0,i;
     char c;

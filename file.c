@@ -164,22 +164,23 @@ int getstrings(char*filename,char note[],char guide[],char dialoge[]){
     int i;
     FILE*fp;
     fp=fopen(filename,"r");
-    for(i=0;(c=getc(fp))!='\n';i++){
+    for(i=0;(c=getc(fp))!='\n';i++){ //gets the note
         note[i]=c;
     }
     i++;
-    for(i=0;(c=getc(fp))!='\n';i++){
+    for(i=0;(c=getc(fp))!='\n';i++){ //gets the guide
         guide[i]=c;
     }
     i++;
-    for(i=0;(c=getc(fp))!='\n';i++){
+    for(i=0;(c=getc(fp))!='\n';i++){ //gets the first dialoge
         dialoge[i]=c;
     }
+    i++;
     fclose(fp);
-    return i;
+    return i; //returns the place in the file where the next dialoge starts
 }
 
-void getdialoge(char*filename,char dialoge[],int initial){
+int getdialoge(char*filename,char dialoge[],int initial){
     char c;
     int i;
     FILE*fp;
@@ -187,7 +188,9 @@ void getdialoge(char*filename,char dialoge[],int initial){
     for(i=initial;(c=getc(fp))!='\n';i++){
         dialoge[i]=c;
     }
+    i++;
     fclose(fp);
+    return i;
 }
 
 void filemain(char gamename[], char legend[], char map[]){

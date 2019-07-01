@@ -186,5 +186,6 @@ void filemain(char gamename[], char legend[], char map[]){
     readmap(strcat(strcat("map-",gamename),".txt"),map);
     readlegend(strcat(strcat("game-",gamename),".txt"),legend);
     applyLegend(legend);
+    getstrings("strings.txt",note,guide,dialoge);
 }
 

@@ -195,7 +195,7 @@ int getdialoge(char*filename,char dialoge[],int initial){
 
 void filemain(char gamename[], char legend[], char map[]){
     readFile(strcat(strcat("map-",gamename),".txt"),map);
-    readFile(strcat(strcat("game-",gamename),".txt");,legend);
+    readFile(strcat(strcat("game-",gamename),".txt"),legend);
     applyLegend(legend);
 }
 

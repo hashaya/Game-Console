@@ -16,17 +16,6 @@ int x, y,attackrange=0,raindbpf=0,putammo=0,pai;
 
 char map[MAXFILESIZE],legend[MAXFILESIZE],note[1000],guide[1000],dialoge[1000];
 
-int findchar(char str[],char t){ //returns the index of a char in a string
-    int i;
-    char c;
-    for(i=0;(c=str[i])!=t;i++)
-        if(c=='\0'||c=='\n'){
-            printf("there was a problem finding %c.\n",t);
-            return -1;
-        }
-    return i+1;
-}
-
 void readmap(char*filename,char saveto[]){ //opens a map file, gets the dimensions, and stores the rest in a string
     char c;
     int i;
@@ -194,8 +183,8 @@ int getdialoge(char*filename,char dialoge[],int initial){
 }
 
 void filemain(char gamename[], char legend[], char map[]){
-    readFile(strcat(strcat("map-",gamename),".txt"),map);
-    readFile(strcat(strcat("game-",gamename),".txt"),legend);
+    readmap(strcat(strcat("map-",gamename),".txt"),map);
+    readlegend(strcat(strcat("game-",gamename),".txt"),legend);
     applyLegend(legend);
 }
 

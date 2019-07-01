@@ -10,19 +10,49 @@
 #define TARGET "target"
 #define OBJECT "object"
 
-char sb='\0',mb='\0',db='\0',wl='\0',p1='\0',tg='\0',ob='\0',p1w='\0',p1a='\0',p1s='\0',p1d='\0',qu='\0',opp='\0',oppt='\0',blankespace='\0',putbutton='\0',putwhat='\0';
+char solidblock='\0',moveblock='\0',deathblock='\0',wall='\0',player1='\0',target='\0',object='\0',p1u='\0',p1r='\0',p1d='\0',p1l='\0',quit='\0',opp='\0',opptarget='\0',blankespace=' ',putbutton='\0',putwhat='\0',mapnummode='0';
 float gametime=-1.1;
-int x, y,attackrange=0,raindbpf=0,putammo=0;
+int x, y,attackrange=0,raindbpf=0,putammo=0,pai;
 
-char map[MAXFILESIZE], legend[MAXFILESIZE];
+char map[MAXFILESIZE],legend[MAXFILESIZE],note[1000],guide[1000],dialoge[1000];
 
-void readFile(char*filename,char saveto[]){
+int findchar(char str[],char t){ //returns the index of a char in a string
+    int i;
+    char c;
+    for(i=0;(c=str[i])!=t;i++)
+        if(c=='\0'||c=='\n'){
+            printf("there was a problem finding %c.\n",t);
+            return -1;
+        }
+    return i+1;
+}
+
+void readmap(char*filename,char saveto[]){ //opens a map file, gets the dimensions, and stores the rest in a string
     char c;
     int i;
     FILE*fp;
     fp=fopen(filename,"r");
-    for(i=0;(c=getc(fp))!=EOF;i++)
+    x=strtoint(fp); //gets a number and puts it in x
+    y=strtoint(fp+findchar(fp,'x')); //moves until it finds 'x' and gets a number after that
+    for(i=0;(c=getc(fp))!=EOF;i++){ //puts everything except \n s in a string
+        if(c=='\n')
+            continue;
+        else
+            saveto[i]=c;
+    }
+    saveto[i+1]='\n';
+    saveto[i+2]='\0';
+    fclose(fp);
+}
+
+void readlegend(char*filename,char saveto[]){ //opens a file and puts all it's contents in a string
+    char c;
+    int i;
+    FILE*fp;
+    fp=fopen(filename,"r");
+    for(i=0;(c=getc(fp))!=EOF;i++){
         saveto[i]=c;
+    }
     saveto[i+1]='\n';
     saveto[i+2]='\0';
     fclose(fp);
@@ -38,37 +68,9 @@ int strtoint(char*str){
     return num;
 }
 
-int findchar(char str[],char t){
-    int i;
-    char c;
-    for(i=0;(c=str[i])!=t;i++)
-        if(c=='\0'||c=='\n'){
-            printf("there was a problem finding %c.\n",t);
-            return -1;
-        }
-    return i+1;
+void mapreader(char*num,char*filename,char saveto[]){
+    readmap(strcat(filename,num),saveto);
 }
-
-void makepoints(char name,int points,int number){
-
-}
-
-int randint(int upper,int lower){
-    int num;
-    num=(rand()%(upper-lower+1))+lower;
-    return num;
-}
-
-void make(char board[],char what, int n){
-    int place, i;
-    i = 0;
-    while (i < n) {
-        for(place=randint((x*y)-(x+1), (x+1));board[place]!=' ';place=randint((x*y)-(x+1), (x+1)));
-        board[place]=what;
-        i++;
-    }
-}
-
 
 void applyLegendLine(char*line){
     int i,n;
@@ -86,49 +88,59 @@ void applyLegendLine(char*line){
     op[n]='\0';
     /////////////////////////////////blocks
     if(strcmp(act,SOLIDBLOCK)==0)
-        sb=op[0];
+        solidblock=op[0];
     else if(strcmp(act,MOVEBLOCK)==0)
-        mb=op[0];
+        moveblock=op[0];
     else if(strcmp(act,DEATHBLOCK)==0)
-        db=op[0];
+        deathblock=op[0];
     else if(strcmp(act,WALL)==0)
-        wl=op[0];
+        wall=op[0];
     else if(strcmp(act,PLAYER1)==0)
-        p1=op[0];
+        player1=op[0];
     else if(strcmp(act,TARGET)==0)
-        tg=op[0];
+        target=op[0];
     else if(strcmp(act,OBJECT)==0)
-        ob=op[0];
+        object=op[0];
     ////////////////////////////////settings
     else if(strcmp(act,"time")==0)
         gametime=(float)strtoint(op);
     else if(strcmp(act,"rpoint")==0)
         makepoints(op[0],strtoint(pop+1),strtoint((pop + 3) + findchar(pop + 3, ',')));
     else if(strcmp(act,"up")==0)
-        p1w=op[0];
+        p1u=op[0];
     else if(strcmp(act,"down")==0)
-        p1s=op[0];
-    else if(strcmp(act,"left")==0)
         p1d=op[0];
+    else if(strcmp(act,"left")==0)
+        p1l=op[0];
     else if(strcmp(act,"right")==0)
-        p1a=op[0];
+        p1r=op[0];
     else if(strcmp(act,"attack")==0)
         attackrange=strtoint(pop);
     else if(strcmp(act,"raindb")==0)
         raindbpf=strtoint(pop);
         //
     else if(strcmp(act,"quit")==0)
-        qu=op[0];
+        quit=op[0];
+    else if(strcmp(act,"mode"))
+        mode=op[0];
     ////////////////////////////opponent and put!
     else if(strcmp(act,"opp")==0){
         opp=op[0];
-        oppt=op[2];
+        opptarget=op[2];
     }
     else if(strcmp(act,"put")==0){
         putbutton=op[0];
         putwhat=op[2];
         putammo=strtoint(pop+4);
     }
+    if(opp!='\0'&&player!='\0')
+        pai=0;
+    else if(player!='\0')
+        pai=1;
+    else if(opp!='\0')
+        pai=2;
+    else
+        pai=3;
 }
 
 void applyLegend(char legend[]){
@@ -147,26 +159,40 @@ void applyLegend(char legend[]){
     applyLegendLine(line);
 }
 
-void move(){}
-
-void moveai(){}
-
-void play(){
-    if(p1!='\0')
-        move();
-    if(opp!='\0')
-        moveai();
+int getstrings(char*filename,char note[],char guide[],char dialoge[]){
+    char c;
+    int i;
+    FILE*fp;
+    fp=fopen(filename,"r");
+    for(i=0;(c=getc(fp))!='\n';i++){
+        note[i]=c;
+    }
+    i++;
+    for(i=0;(c=getc(fp))!='\n';i++){
+        guide[i]=c;
+    }
+    i++;
+    for(i=0;(c=getc(fp))!='\n';i++){
+        dialoge[i]=c;
+    }
+    fclose(fp);
+    return i;
 }
 
-int main(){
-    srand(time(NULL));
-    readFile("map01.txt",map);
-    printf("%s\n",map);
-    readFile("legend01.txt",legend);
-    printf("%s\n",legend);
-    applyLegend();
-    play();
-    printf("%c", mb);
-    return 0;
+void getdialoge(char*filename,char dialoge[],int initial){
+    char c;
+    int i;
+    FILE*fp;
+    fp=fopen(filename,"r");
+    for(i=initial;(c=getc(fp))!='\n';i++){
+        dialoge[i]=c;
+    }
+    fclose(fp);
+}
+
+void filemain(char gamename[], char legend[], char map[]){
+    readFile(strcat(strcat("map-",gamename),".txt"),map);
+    readFile(strcat(strcat("game-",gamename),".txt");,legend);
+    applyLegend(legend);
 }
 

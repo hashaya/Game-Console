@@ -133,7 +133,7 @@ void applyLegendLine(char*line){
         putwhat=op[2];
         putammo=strtoint(pop+4);
     }
-    if(opp!='\0'&&player!='\0')
+    if(opp!='\0'&&player1!='\0')
         pai=0;
     else if(player!='\0')
         pai=1;

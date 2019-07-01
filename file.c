@@ -135,7 +135,7 @@ void applyLegendLine(char*line){
     }
     if(opp!='\0'&&player1!='\0')
         pai=0;
-    else if(player!='\0')
+    else if(player1!='\0')
         pai=1;
     else if(opp!='\0')
         pai=2;

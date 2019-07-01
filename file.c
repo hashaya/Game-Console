@@ -122,7 +122,7 @@ void applyLegendLine(char*line){
     else if(strcmp(act,"quit")==0)
         quit=op[0];
     else if(strcmp(act,"mode"))
-        mode=op[0];
+        mapnummode=op[0];
     ////////////////////////////opponent and put!
     else if(strcmp(act,"opp")==0){
         opp=op[0];

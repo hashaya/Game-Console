@@ -23,7 +23,7 @@ int gameisavailable(char gamename[]){
 void ui(){
     printf("\n Console Starting...");
     sleep(1);
-    while(gamename != "quit"){
+    while(1){
         system("cls");
         printf("\n Enter the name of game\n ");
         gets(gamename);
@@ -32,7 +32,7 @@ void ui(){
             getchar();
         }
         else{
-            printf("\n Game successfully loaded.\n ");
+            printf("\n Game successfully imported.\n ");
             sleep(1);
             return;
 

@@ -2,6 +2,7 @@
 #include <windows.h> // Used for hiding the cursor
 #include <time.h>  // used for sleep
 
+extern float gametime;
 extern int x, y, player1score, computerscore;
 extern char player1, opp, map[];
 
@@ -9,8 +10,8 @@ void hidecursor(); //hodes the cursor
 void sleep(int delay); // makes delay for "delay" seconds
 void printmessege(char *str, int delay); // prints str for "delay" seconds
 void pause(char pausebut, char *pausemessege);
-void printscreen(char map[]);
-void printscore(int player1score, int computerscore, int aiscore, float gametime);
+void print_screen(char map[]);
+void printscore(int player1score, int computerscore, int aiscore);
 void glance(char map[], int glancetime); // shows map for glancetime seconds
 void endgame(int end, int stage);
 void make(char map[], char what, int n);
@@ -54,7 +55,7 @@ void pause(char pausebut, char *pausemessege){
     system("cls");
 }
 
-void printscreen(char map[]) {
+void print_screen(char map[]) {
     int i = 0;
     while (map[i] != '\0') {
         printf("%.*s\n", x + 2, map + i);
@@ -62,9 +63,9 @@ void printscreen(char map[]) {
     }
 }
 
-void printscore(int player1score, int computerscore, int aiscore, float gametime){
+void printscore(int player1score, int computerscore, int aiscore){
     printf("\n");
-    if (gametime > 0)
+    if (gametime > 0.0)
         printf("Remaining time: %0.1f\n\n", gametime);
     printf("Player 1 score: %d", player1score);
     if (aiscore == 1)
@@ -78,7 +79,7 @@ void glance(char map[], int glancetime) {
         system("cls");
         printf("\n Take a look  at the map... %d\n\n", glancetime);
         glancetime--;
-        printscreen(map);
+        print_screen(map);
         while (clock() < temp_time + 1000);
     }
 }
@@ -113,13 +114,11 @@ int randint(int upper,int lower){
 void make(char map[],  char what, int n){ //puts n number of a given symbol in empty spaces within the map
     int place, i;
     i = 0;
-    printf("%s", map);
     while (i < n) {
 
         place=randint((x*y)-(x+1), (x+1));
         while (map[place] != ' '){
             place=randint((x*y)-(x+1), (x+1));
-            printf("place =%chello\n", map[place]);
         }
         //for(place=randint((x*y)-(x+1), (x+1));map[place]!=' ';place=randint((x*y)-(x+1), (x+1))){
 

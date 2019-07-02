@@ -11,37 +11,44 @@
 #define TARGET "target"
 #define OBJECT "object"
 
-char mapnummode = '0';
-extern char dialogue[];
-extern char solidblock,moveblock,deathblock,wall,player1,target,object,p1u,p1r,p1d,p1l,quit,opp,opptarget,blankespace,putbutton,putwhat;
+//char mapnummode = '0';
+extern char dialogue[], map[];
+extern char solidblock,moveblock,deathblock,wall,player1,target,object,p1u,p1r,p1d,p1l,quit,opp,opptarget,blankespace,putbutton,putwhat,point, pausebut;
 extern float gametime;
-extern int x, y,attackrange,raindbpf,putammo,pai, pointperdot, pai, glanceon, mode;
+extern int x, y,attackrange,raindbpf,putammo,pai, pointperdot, pai, glanceon, mode, numberofpoints, player1index, stages;
 
 char map[MAXFILESIZE],legend[MAXFILESIZE],note[1000],guide[1000],dialoge[1000];
 
 int readsize(char *filename){
     FILE *fp = fopen(filename, "r");
-    fscanf(fp, "%d*%d", x, y);
+    printf("FILENAME = %s\n\n", filename);
+    int a = fscanf(fp, "%dx%d", &y, &x);
     fclose(fp);
+    printf("MAP = %d\n\n", a);
     return x*y;
 }
+
 void readmap(char*filename,char saveto[]){ //opens a map file, gets the dimensions, and stores the rest in a string
     char c;
     int i;
     FILE*fp;
     fp=fopen(filename,"r");
-    fscanf(fp, "%d*%d", x, y);
+    fscanf(fp, "%dx%d\n", &y, &x);
+    x -= 2;
+    y -= 2;
+
     /*x=strtoint(fp); //gets a number and puts it in x
     y=strtoint(fp+findchar(fp,'x')); //moves until it finds 'x' and gets a number after that*/
-    for(i=0;(c=getc(fp))!=EOF;i++){ //puts everything except \n s in a string
-        if(c=='\n')
-            continue;
-        else
+    for(i=0;(c=getc(fp))!=EOF;){ //puts everything except \n s in a string
+        if(c!='\n'){
             saveto[i]=c;
+            i++;
+        }
+
     }
-    saveto[i+1]='\n';
-    saveto[i+2]='\0';
+    saveto[i]='\0';
     fclose(fp);
+
 }
 
 void readfile(char*filename,char saveto[]){ //opens a file and puts all it's contents in a string
@@ -90,7 +97,7 @@ char*mapreader(int num,char*filename){
     readmap(strcat(filename,number),saveto);
     return saveto;
 }
-void applyLegendLine(char*line){
+void applyLegendLine(char *map, char *line){
     int i,n;
     char c;
     char act[25];
@@ -105,26 +112,30 @@ void applyLegendLine(char*line){
 
     op[n]='\0';
     /////////////////////////////////blocks
-    if(strcmp(act,SOLIDBLOCK)==0)
+    if(strcmp(act,"solidblock")==0)
         solidblock=op[0];
-    else if(strcmp(act,MOVEBLOCK)==0)
+    else if(strcmp(act,"moveblock")==0)
         moveblock=op[0];
-    else if(strcmp(act,DEATHBLOCK)==0)
+    else if(strcmp(act,"deathblock")==0)
         deathblock=op[0];
-    else if(strcmp(act,WALL)==0)
+    else if(strcmp(act,"wall")==0)
         wall=op[0];
-    else if(strcmp(act,PLAYER1)==0)
-        player1=op[0];
-    else if(strcmp(act,TARGET)==0)
+    else if(strcmp(act,"character")==0){
+        player1 = op[0];
+        player1index = findchar(map, player1);
+    }
+    else if(strcmp(act,"target")==0)
         target=op[0];
-    else if(strcmp(act,OBJECT)==0)
+    else if(strcmp(act,"object")==0)
         object=op[0];
+    else if(strcmp(act,"pause")==0)
+        pausebut=op[0];
     ////////////////////////////////settings
     else if(strcmp(act,"time")==0)
         gametime=(float)strtoint(op);
     else if(strcmp(act,"rpoint")==0){
-        make(map, op[0], strtoint((pop + 2) + findchar(pop + 2, ',')));
-        pointperdot = strtoint(pop+1);
+        sscanf(op, "%c,%d,%d", &point, &pointperdot, &numberofpoints);
+        make(map, op[0], numberofpoints);
     }
     else if(strcmp(act,"up")==0)
         p1u=op[0];
@@ -135,9 +146,9 @@ void applyLegendLine(char*line){
     else if(strcmp(act,"right")==0)
         p1r=op[0];
     else if(strcmp(act,"attack")==0)
-        attackrange=strtoint(pop);
+        attackrange=strtoint(op);
     else if(strcmp(act,"raindb")==0)
-        raindbpf=strtoint(pop);
+        raindbpf=strtoint(op);
         //
     else if(strcmp(act,"quit")==0)
         quit=op[0];
@@ -145,6 +156,8 @@ void applyLegendLine(char*line){
         mode=op[0];
     else if(strcmp(act,"glance"))
         glanceon=strtoint(op);
+    else if(strcmp(act,"multistage"))
+        stages=strtoint(op);
     ////////////////////////////opponent and put!
     else if(strcmp(act,"opp")==0){
         opp=op[0];
@@ -153,7 +166,7 @@ void applyLegendLine(char*line){
     else if(strcmp(act,"put")==0){
         putbutton=op[0];
         putwhat=op[2];
-        putammo=strtoint(pop+4);
+        putammo=strtoint(op[4]);
     }
     if(opp!='\0')
         pai=0;
@@ -161,22 +174,21 @@ void applyLegendLine(char*line){
         pai=1;
 }
 
-void applyLegend(char legend[]){
-    char line[60];
-    char c;
-    int i = 0,l;
-    for(i = 0, l=0;(c=legend[i])!='\0';i++, l++){
-        printf("%d\n", i);
+void applyLegend(char *map, char legend[]){
+    char c, line[60];
+    int i, l;
+    for(i = 0, l = 0;(c=legend[i])!='\0';i++, l++){
         line[l]=c;
         if(c=='\n'){
             line[l+1]='\0';
-            applyLegendLine(line);
-            printf("%s", line);
+            applyLegendLine(map, line);
             l=-1;
         }
     }
     line[l+1]='\0';
-    applyLegendLine(line);
+    applyLegendLine(map, line);
+    player1index = findchar(map, player1);
+
 }
 
 char *getstring(char what[], int n, char*gamename){
@@ -205,7 +217,7 @@ int getdialoge(char*filename,char dialoge[],int initial){
 int filemain(char gamename[], char legend[], char map[]){
     readmap(strcat(strcat("map-",gamename),".txt"),map);
     readfile(strcat(strcat("game-",gamename),".txt"),legend);
-    applyLegend(legend);
+    applyLegend(map, legend);
     readfile(strcat("note-",gamename),note);
     readfile(strcat("guide-",gamename),guide);
     readfile(strcat("dialogue-",gamename),dialogue);

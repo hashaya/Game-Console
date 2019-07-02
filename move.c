@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-extern int x, y, putindex, putammo, endofgame, attackrange, computerindex, pointperdot;
+extern int x, y, putindex, putammo, endofgame, attackrange, computerindex, pointperdot, player1index;
 extern char putwhat, p1r, p1l, p1u, p1d, solidblock, wall, opp, moveblock, target, opptarget, putbutton, point, deathblock, object;
 
 int attack(int index, char map[], char control, int attackrange){
@@ -44,6 +44,7 @@ void move(int index, int to, char map[]){
         map[index] = ' ';
     if (to != -1)
         map[to] = what;
+
 }
 
 int moveb(int index, char control, char map[], int blockorobject){
@@ -51,77 +52,87 @@ int moveb(int index, char control, char map[], int blockorobject){
        blockorobject = 0 for moveblock and 1 for object; */
     if (blockorobject == 0){
         if (control == p1r){
-            if (map[index + 2] != solidblock && map[index + 2] != wall && map[index + 2] != opp){
+            if (map[index + 2] != solidblock && map[index + 2] != wall && map[index + 2] != opp && map[index + 2] != target && map[index + 2] != moveblock && map[index + 2] != object){
                 move(index + 1, index + 2, map);
                 move(index, index + 1, map);
                 return index + 1;
             }
+            return index;
         }
         else if (control == p1l){
-            if (map[index - 2] != solidblock && map[index - 2] != wall && map[index - 2] != opp){
+            if (map[index - 2] != solidblock && map[index - 2] != wall && map[index - 2] != opp && map[index - 2] != target && map[index - 2] != moveblock && map[index - 2] != object){
                 move(index - 1, index - 2, map);
                 move(index, index - 1, map);
                 return index - 1;
             }
+            return index;
         }
         else if (control == p1d){
-            if (map[index + 2 * x + 4] != solidblock && map[index + 2 * x + 4] != wall && map[index + 2 * x + 4] != opp){
+            if (map[index + 2 * x + 4] != solidblock && map[index + 2 * x + 4] != wall && map[index + 2 * x + 4] != opp && map[index + 2 * x + 4] != target && map[index + 2 * x + 4] != moveblock && map[index + 2 * x + 4] != object){
                 move(index + x + 2, index + 2 * x + 4, map);
                 move(index, index + x + 2, map);
                 return index + x + 2;
             }
+            return index;
         }
         else if (control == p1u){
-            if (map[index - 2 * x - 4] != solidblock && map[index - 2 * x - 4] != wall && map[index - 2 * x - 4] != opp){
+            if (map[index - 2 * x - 4] != solidblock && map[index - 2 * x - 4] != wall && map[index - 2 * x - 4] != opp && map[index - 2 * x - 4] != target && map[index - 2 * x - 4] != moveblock && map[index - 2 * x - 4] != object){
                 move(index - x - 2, index - 2 * x - 4, map);
                 move(index, index - x - 2, map);
                 return index - x - 2;
             }
+            return index;
         }
     }
     else if (blockorobject == 1){
         if (control == p1r){
-            if (map[index + 2] != solidblock && map[index + 2] != wall && map[index + 2] != opp){
+            if (map[index + 2] != solidblock && map[index + 2] != wall && map[index + 2] != opp && map[index + 2] != moveblock && map[index + 2] != object){
                 if (map[index + 2] == target)
                     endofgame = 1;
                 move(index + 1, index + 2, map);
                 move(index, index + 1, map);
                 return index + 1;
             }
+            return index;
         }
         else if (control == p1l){
-            if (map[index - 2] != solidblock && map[index - 2] != wall && map[index - 2] != opp){
+            if (map[index - 2] != solidblock && map[index - 2] != wall && map[index - 2] != opp && map[index - 2] != moveblock && map[index - 2] != object){
                 if (map[index - 2] == target)
                     endofgame = 1;
                 move(index - 1, index - 2, map);
                 move(index, index - 1, map);
                 return index - 1;
             }
+            return index;
         }
         else if (control == p1d){
-            if (map[index + 2 * x + 4] != solidblock && map[index + 2 * x + 4] != wall && map[index + 2 * x + 4] != opp){
+            if (map[index + 2 * x + 4] != solidblock && map[index + 2 * x + 4] != wall && map[index + 2 * x + 4] != opp && map[index + 2 * x + 4] != moveblock && map[index + 2 * x + 4] != object){
                 if (map[index + 2 * x + 4] == target)
                     endofgame = 1;
                 move(index + x + 2, index + 2 * x + 4, map);
                 move(index, index + x + 2, map);
                 return index + x + 2;
             }
+            return index;
         }
         else if (control == p1u){
-            if (map[index - 2 * x - 4] != solidblock && map[index - 2 * x - 4] != wall && map[index - 2 * x - 4] != opp){
+            if (map[index - 2 * x - 4] != solidblock && map[index - 2 * x - 4] != wall && map[index - 2 * x - 4] != opp && map[index - 2 * x - 4] != moveblock && map[index - 2 * x - 4] != object){
                 if (map[index - 2 * x - 4] == target)
                     endofgame = 1;
                 move(index - x - 2, index - 2 * x - 4, map);
                 move(index, index - x - 2, map);
                 return index - x - 2;
             }
+            return index;
         }
     }
 }
 
 int action(int index, char control, char map[]){ // returns new index
-    if (control == '\0')
+
+    if (control == '\0'){
         return index;
+    }
     int to;
     if (control == p1r || control == 'D')
         to = index + 1;
@@ -143,10 +154,10 @@ int action(int index, char control, char map[]){ // returns new index
         if(map[to]==target){
             if (control == p1l || control == p1d || control == p1r || control == p1u){
                 move(index, to, map);
-                endofgame = 0;
+                endofgame = 1;
             }
         }
-        else if(map[to] == opptarget){
+        else if(map[to] == opptarget && opptarget != point){
             if (control == 'A' || control == 'S' || control == 'D' || control == 'W'){
                 move(index, to, map);
                 endofgame = -1;
@@ -155,6 +166,8 @@ int action(int index, char control, char map[]){ // returns new index
         else if(map[to] == point){
             what = map[index];
             addpoint(what, pointperdot);
+            move(index, to, map);
+            make(map, point, 1);
         }
         else if(map[to] == deathblock){
             move(index, -1, map);
@@ -168,6 +181,7 @@ int action(int index, char control, char map[]){ // returns new index
         }
         else
             move(index, to, map);
+        return to;
     }
-    return to;
+    return index;
 }

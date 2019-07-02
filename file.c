@@ -12,9 +12,9 @@
 
 char solidblock='\0',moveblock='\0',deathblock='\0',wall='\0',player1='\0',target='\0',object='\0',p1u='\0',p1r='\0',p1d='\0',p1l='\0',quit='\0',opp='\0',opptarget='\0',blankespace=' ',putbutton='\0',putwhat='\0',mapnummode='0';
 float gametime=-1.1;
-int x, y,attackrange=0,raindbpf=0,putammo=0,pai;
+int x, y,attackrange=0,raindbpf=0,putammo=0,pai,randommap=0,multistage=1,glanceon=0;
 
-char map[MAXFILESIZE],legend[MAXFILESIZE],note[1000],guide[1000],dialoge[1000];
+char map[MAXFILESIZE],legend[MAXFILESIZE],note[1000],guide[1000],dialogue[1000];
 
 void readmap(char*filename,char saveto[]){ //opens a map file, gets the dimensions, and stores the rest in a string
     char c;
@@ -34,7 +34,7 @@ void readmap(char*filename,char saveto[]){ //opens a map file, gets the dimensio
     fclose(fp);
 }
 
-void readlegend(char*filename,char saveto[]){ //opens a file and puts all it's contents in a string
+void readfile(char*filename,char saveto[]){ //opens a file and puts all it's contents in a string
     char c;
     int i;
     FILE*fp;
@@ -47,7 +47,6 @@ void readlegend(char*filename,char saveto[]){ //opens a file and puts all it's c
     fclose(fp);
 }
 
-
 int strtoint(char*str){
     char c;
     int num,i;
@@ -57,8 +56,15 @@ int strtoint(char*str){
     return num;
 }
 
-void mapreader(char*num,char*filename,char saveto[]){
-    readmap(strcat(filename,num),saveto);
+char*inttostr(int num){}
+
+char*mapreader(int num,char*filename){
+    char*saveto;
+    char number[10];
+    saveto=(char*)malloc(x*y*sizeof(char));
+    number=itoa(num,number,10);
+    readmap(strcat(filename,number),saveto);
+    return saveto;
 }
 
 void applyLegendLine(char*line){
@@ -112,6 +118,8 @@ void applyLegendLine(char*line){
         quit=op[0];
     else if(strcmp(act,"mode"))
         mapnummode=op[0];
+    else if(strcmp(act,"glance"))
+        galnceon=strtoint(op);
     ////////////////////////////opponent and put!
     else if(strcmp(act,"opp")==0){
         opp=op[0];
@@ -122,14 +130,10 @@ void applyLegendLine(char*line){
         putwhat=op[2];
         putammo=strtoint(pop+4);
     }
-    if(opp!='\0'&&player1!='\0')
+    if(opp!='\0')
         pai=0;
-    else if(player1!='\0')
-        pai=1;
-    else if(opp!='\0')
-        pai=2;
     else
-        pai=3;
+        pai=1;
 }
 
 void applyLegend(char legend[]){
@@ -148,44 +152,20 @@ void applyLegend(char legend[]){
     applyLegendLine(line);
 }
 
-int getstrings(char*filename,char note[],char guide[],char dialoge[]){
-    char c;
-    int i;
-    FILE*fp;
-    fp=fopen(filename,"r");
-    for(i=0;(c=getc(fp))!='\n';i++){ //gets the note
-        note[i]=c;
-    }
-    i++;
-    for(i=0;(c=getc(fp))!='\n';i++){ //gets the guide
-        guide[i]=c;
-    }
-    i++;
-    for(i=0;(c=getc(fp))!='\n';i++){ //gets the first dialoge
-        dialoge[i]=c;
-    }
-    i++;
-    fclose(fp);
-    return i; //returns the place in the file where the next dialoge starts
+void getstrings(int n,char guide[],char dialogue[],char*filename){
+    char num[10];
+    itoa(n,num,10);
+    readfile(strcat(strcat(strcat("guide",num),"-"),filename),guide);
+    readfile(strcat(strcat(strcat("dialogue",num),"-"),filename),dialogue);
 }
 
-int getdialoge(char*filename,char dialoge[],int initial){
-    char c;
-    int i;
-    FILE*fp;
-    fp=fopen(filename,"r");
-    for(i=initial;(c=getc(fp))!='\n';i++){
-        dialoge[i]=c;
-    }
-    i++;
-    fclose(fp);
-    return i;
-}
-
-void filemain(char gamename[], char legend[], char map[]){
+int filemain(char gamename[], char legend[], char map[]){
     readmap(strcat(strcat("map-",gamename),".txt"),map);
-    readlegend(strcat(strcat("game-",gamename),".txt"),legend);
+    readfile(strcat(strcat("game-",gamename),".txt"),legend);
     applyLegend(legend);
-    getstrings("strings.txt",note,guide,dialoge);
+    readfile(strcat("note-",filename),note);
+    readfile(strcat("guide-",filename),guide);
+    readfile(strcat("dialogue-",filename),dialogue);
+    return 0;
 }
 

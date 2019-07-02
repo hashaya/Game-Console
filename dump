@@ -10,6 +10,17 @@ int findchar(char str[],char t){
     return i+1;
 }
 
+int findchar(FILE *fp, char x){
+    char c;
+    int i = 0;
+    while((c = fgetc(fp)) != NULL){
+        if (c == x)
+            return i;
+        i++;
+    }
+
+}
+
 void makepoints(char name,int points,int number){
 
 }

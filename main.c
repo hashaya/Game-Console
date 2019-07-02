@@ -8,15 +8,17 @@
 
 char m[10], g[10];
 char *map, legend[1000], note[10000], guide[1000], dialogue[1000], gamename[100] = "";
-char solidblock='\0',moveblock='\0',deathblock='\0',wall='\0',target='\0',object='\0',quit='\0',opp='\0',opptarget='\0',blankespace='\0',putbutton='\0',putwhat='\0', pausebut = '\0', point, control;
-char player1='\0',p1u='\0',p1d='\0',p1l='\0',p1r='\0', computerdirection;
-float gametime=-1.1;
-int x, y, pointperdot, mode = 0, attackrange = 0, raindbpf = 0, putammo = 0, putindex = -1; player1score, computerscore = -1, player1index, computerindex[100], stages, currentstage = 0, glanceon, pai, aiscore, numberofpoints;
+char solidblock='\0',moveblock='\0',deathblock='\0',wall='\0',target='\0',object='\0',quit='\0',opp='\0',opptarget='\0',blankespace='\0', pausebut = '\0', point, control;
+char putbutton='\0',putwhat='\0', putammo = 0, putindex = -1;
+char player1='\0',p1u='\0',p1d='\0',p1l='\0',p1r='\0';
+int player1score, player1index;
+float gametime = -1;
+int x, y, pointperdot, mode = 0, attackrange = 0, raindbpf = 0, computerscore = -1, computerindex[100], stages, currentstage = 0, glanceon, pai, aiscore, numberofpoints;
 int endofgame; // -1 if palyer1 loses, 1 if wins, 0 if game should be continued
 int anote = 0, aguide = 0, adialogue = 0;
 
 void aiplay(char map[], int computerindex){
-    printf("");
+    return;
 
 }
 
@@ -25,16 +27,13 @@ int main(){
     srand(time(NULL));
     system("cls");
     ui(); // name of game
-    char txt[] = ".txt\0";
+    char txt[] = ".txt";
     strcpy(m, "map-");
     strcat(strcat(m,gamename),txt);
     strcpy(g, "game-");
     strcat(strcat(g,gamename),txt);
-
-    printf("%s----------%s", m, g);
     //if (filemain(gamename, map, legend) != 0) in tabe bayad tori taghir konad ke faghat legend ra bekhanad
     //    return end(0); // error
-    readfile(g,legend);
     player1score = 0;
     computerscore = 0;
     system("cls");
@@ -47,13 +46,11 @@ int main(){
     if (mode == 0){ // single-stage
         //printf("%s\n\n", strcat(strcat(m,gamename),".txt"));
         mapsize = readsize(m);
-        printf("MAPSIZE = %d\n\n\n", mapsize);
         // some checks for errors
         map = (char *)malloc(mapsize * sizeof(char) + 1);
-        readmap(m,map);
-
+        readmap(m, map);
+        readfile(g,legend);
         applyLegend(map, legend);
-        printf("x = %d, y = %d", x, y);
         if (aguide)
             strcpy(guide, getstring("guide", 0, gamename));
 
@@ -63,11 +60,11 @@ int main(){
             glance(map, GLANCETIME);
         endofgame = 0;
         int temptime = clock();
-
         while (gametime > 0.1){ // main loop for single-stage games
             control = '\0';
             while (clock() < temptime + DELAY) {
-                control = _getch();
+                if (kbhit())
+                    control = _getch();
                 if (control == quit)
                     exit(0);
                 else if (control == pausebut)
@@ -78,9 +75,9 @@ int main(){
                 aiplay(map, computerindex);
             gametime -= TIMEREDUCTION;
             system("cls");
-            printscreen(map);
-            //printscore(player1score, computerscore, aiscore, gametime); // aiscore shows that ai can have score or not (default = 0)
-            printf("%d", player1index);
+            print_screen(map);
+            printscore(player1score, computerscore, aiscore); // aiscore shows that ai can have score or not (default = 0)
+            printf("Plyer1index = %d", player1index);
             temptime = clock();
             if (endofgame != 0)
                 break;
@@ -118,7 +115,7 @@ int main(){
                     aiplay(map, computerindex);
                 gametime -= TIMEREDUCTION;
                 system("cls");
-                printscreen(map);
+                print_screen(map);
                 printscore(player1score, computerscore, aiscore, gametime); // aiscore shows that ai can have score or not (default = 0)
                 temptime = clock();
                 if (endofgame != 0)

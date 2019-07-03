@@ -37,6 +37,7 @@ void hidecursor() {
 }
 
 void printmessege(char *str, int delay){
+    system("cls");
     printf("%s", str);
     if (delay == 0){
         printf("\nPress Enter to continue...");
@@ -51,7 +52,7 @@ void pause(char pausebut, char *pausemessege){
     system("cls");
     printf("\n Paused. Press %c again to continue.\n\n", pausebut);
     printf("%s", pausemessege);
-    while(getchar() != pausebut);
+    while(_getch() != pausebut);
     system("cls");
 }
 

@@ -12,19 +12,17 @@
 #define OBJECT "object"
 
 //char mapnummode = '0';
-extern char dialogue[], map[];
+extern char dialogue[], map[], mo[];
 extern char solidblock,moveblock,deathblock,wall,player1,target,object,p1u,p1r,p1d,p1l,quit,opp,opptarget,blankespace,putbutton,putwhat,point, pausebut;
 extern float gametime;
-extern int x, y,attackrange,raindbpf,putammo,pai, pointperdot, pai, glanceon, mode, numberofpoints, player1index, stages;
+extern int x, y,attackrange,raindbpf,putammo,pai, pointperdot, pai, glanceon, mode, numberofpoints, player1index, stages, random, computerindex[];
 
 char map[MAXFILESIZE],legend[MAXFILESIZE],note[1000],guide[1000],dialoge[1000];
 
 int readsize(char *filename){
     FILE *fp = fopen(filename, "r");
-    printf("FILENAME = %s\n\n", filename);
-    int a = fscanf(fp, "%dx%d", &y, &x);
+    fscanf(fp, "%dx%d", &y, &x);
     fclose(fp);
-    printf("MAP = %d\n\n", a);
     return x*y;
 }
 
@@ -61,8 +59,7 @@ void readfile(char*filename,char saveto[]){ //opens a file and puts all it's con
     for(i=0;(c=getc(fp))!=EOF;i++){
         saveto[i]=c;
     }
-    saveto[i+1]='\n';
-    saveto[i+2]='\0';
+    saveto[i]='\0';
     fclose(fp);
 }
 
@@ -152,21 +149,21 @@ void applyLegendLine(char *map, char *line){
         //
     else if(strcmp(act,"quit")==0)
         quit=op[0];
-    else if(strcmp(act,"mode"))
-        mode=op[0];
     else if(strcmp(act,"glance"))
         glanceon=strtoint(op);
     else if(strcmp(act,"multistage"))
         stages=strtoint(op);
     ////////////////////////////opponent and put!
-    else if(strcmp(act,"opp")==0){
+    if(strcmp(act,"opp")==0){
         opp=op[0];
         opptarget=op[2];
+
     }
-    else if(strcmp(act,"put")==0){
-        putbutton=op[0];
-        putwhat=op[2];
-        putammo=strtoint(op[4]);
+    if(strcmp(act,"put")==0){
+        sscanf(op, "%c%*c%c%*c%d", &putbutton, &putwhat, &putammo);
+        //putbutton=op[0];
+        //putwhat=op[2];
+        //putammo=strtoint(&op[4]);
     }
     if(opp!='\0')
         pai=0;
@@ -185,8 +182,8 @@ void applyLegend(char *map, char legend[]){
             l=-1;
         }
     }
-    line[l+1]='\0';
-    applyLegendLine(map, line);
+    //line[l+1]='\0';
+    //applyLegendLine(map, line);
     player1index = findchar(map, player1);
 
 }
@@ -197,6 +194,7 @@ char *getstring(char what[], int n, char*gamename){
         num[0] = '\0';
     else
         itoa(n,num,10);
+    //strcat(strcat(strcat(strcat(what, num), "-"), gamename), ".txt");
     readfile(strcat(strcat(strcat(strcat(what, num), "-"), gamename), ".txt"), string);
     return string;
 }
@@ -212,6 +210,21 @@ int getdialoge(char*filename,char dialoge[],int initial){
     i++;
     fclose(fp);
     return i;
+}
+
+void readmode(char *gamename){
+    strcat(strcat(mo, gamename), ".txt");
+    char str[1000];
+    readfile(mo, str);
+    char set[100];
+    int numb;
+
+    numb = sscanf(str, "%*s\t%d\n%*s\t%d\n%*s\t%d", &mode, &random, &stages);
+    if(strcmp(str, "") == 0){
+        mode = 0;
+        random = 0;
+        stages = 0;
+    }
 }
 
 int filemain(char gamename[], char legend[], char map[]){

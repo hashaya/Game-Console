@@ -32,12 +32,11 @@ char findroute(int index,char targ,char*map){
 
 }
 
+
 void ai(int indexes[],char targ,char*map){
     int i,ind;
     for(i=0;(ind=indexes[i])!=-2;i++){
-        if(ind==-1)
-            continue;
-        else
-            findroute(ind,targ,map);
+        if(ind!=-1)
+            action(ind,findroute(ind,targ,map),map);
     }
 }
